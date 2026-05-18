@@ -24,7 +24,13 @@ export default function Terminal({ compact = false }: { compact?: boolean }) {
     let i = 0;
     setLines([]);
     const t = setInterval(() => {
-      setLines((l) => [...l, baseLines[i]]);
+      const next = baseLines[i];
+      if (next === undefined) {
+        clearInterval(t);
+        setDone(true);
+        return;
+      }
+      setLines((l) => [...l, next]);
       i++;
       if (i >= baseLines.length) {
         clearInterval(t);
@@ -43,7 +49,7 @@ export default function Terminal({ compact = false }: { compact?: boolean }) {
         <span className="ml-2 text-[11px] font-mono text-slate-400">~/shield · zsh</span>
       </div>
       <div className="p-4 font-mono text-[12px] leading-relaxed text-emerald-300/90 h-[calc(100%-2.25rem)] overflow-auto no-scrollbar">
-        {lines.map((l, i) => (
+        {lines.filter(Boolean).map((l, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, x: -8 }}
